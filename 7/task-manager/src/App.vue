@@ -27,6 +27,18 @@
     <form v-on:submit.prevent="addLabel">
       <input type="text" v-model="newLabelText" placeholder="新しいラベル">
     </form>
+
+    <h2>ラベルでフィルタ</h2>
+    <ul>
+      <li v-for="label in labels" v-bind:key="label.id">
+        <input type="radio" v-bind:checked="label.id === filter" v-on:change="changeFilter(label.id)">
+          {{ label.text }}
+      </li>
+      <li>
+        <input type="radio" v-bind:checked="filter === null" v-on:change="changeFilter(null)">
+        フィルタしない
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -46,11 +58,14 @@ export default {
   },
   computed: {
     tasks() {
-      return this.$store.state.tasks
+      return this.$store.getters.filteredTasks
     },
     labels() {
       return this.$store.state.labels
     },
+    filter () {
+      return this.$store.state.filter
+    }
   },
   methods: {
     addTask () {
@@ -78,6 +93,13 @@ export default {
     getLabelText (id) {
       const label = this.labels.filter(label => label.id === id)[0]
       return label ? label.text : ''
+    },
+    // フィルタする対象のラベルを変更する
+    changeFilter (labelId) {
+      // 'changeFilter'ミューテーションをコミット
+      this.$store.commit('changeFilter', {
+        filter: labelId
+      })
     },
   }
 }
